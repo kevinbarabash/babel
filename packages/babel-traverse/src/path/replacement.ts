@@ -195,12 +195,16 @@ export function _replaceWith(this: NodePath, node) {
     throw new ReferenceError("Container is falsy");
   }
 
-  if (this.inList) {
-    // @ts-expect-error todo(flow->ts): check if t.validate accepts a numeric key
-    t.validate(this.parent, this.key, [node]);
-  } else {
-    t.validate(this.parent, this.key as string, node);
-  }
+  // As flow-to-ts transforms an AST containing Flow types to one containing
+  // TypeScript types, there will be a mix of nodes in the tree.  All of the
+  // nodes eventually get converted, but while this is going on, parts of the
+  // tree are invalid so we disable validation.
+  // if (this.inList) {
+  //   // @ts-expect-error todo(flow->ts): check if t.validate accepts a numeric key
+  //   t.validate(this.parent, this.key, [node]);
+  // } else {
+  //   t.validate(this.parent, this.key as string, node);
+  // }
 
   this.debug(`Replace with ${node?.type}`);
   pathCache.get(this.parent)?.set(node, this).delete(this.node);
